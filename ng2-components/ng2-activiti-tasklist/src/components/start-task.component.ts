@@ -53,13 +53,15 @@ export class StartTaskComponent implements OnInit {
     @Output()
     error: EventEmitter<any> = new EventEmitter<any>();
 
+    filteredPeople: User[];
+
     people: User[] = [];
 
     startTaskmodel: StartTaskModel = new StartTaskModel();
 
     forms: Form[];
 
-    assigneeId: number;
+    assignee: User;
 
     formKey: number;
 
@@ -90,7 +92,7 @@ export class StartTaskComponent implements OnInit {
                 .switchMap((createRes: any) =>
                     this.attachForm(createRes.id, this.formKey).defaultIfEmpty(createRes)
                         .switchMap((attachRes: any) =>
-                            this.assignTaskByUserId(createRes.id, this.assigneeId).defaultIfEmpty(attachRes ? attachRes : createRes)
+                            this.assignTaskByUserId(createRes.id, this.assignee.id).defaultIfEmpty(attachRes ? attachRes : createRes)
                         )
                 )
                 .subscribe(
@@ -151,10 +153,46 @@ export class StartTaskComponent implements OnInit {
         return data === undefined || data === null || data.trim().length === 0;
     }
 
-    public getDisplayUser(firstName: string, lastName: string, delimiter: string = '-'): string {
-        firstName = (firstName !== null ? firstName : '');
-        lastName = (lastName !== null ? lastName : '');
-        return firstName + delimiter + lastName;
+    getInitialUserName(user: User) {
+        if (user) {
+            let displayName = `${user.firstName ? user.firstName[0] : ''} ${user.lastName ? user.lastName[0] : '' }`;
+            return displayName.trim();
+        }
+
+        return '';
+    }
+
+    getDisplayName(user: User) {
+        if (user) {
+            let displayName = `${user.firstName || ''} ${user.lastName || ''}`;
+            return displayName.trim();
+        }
+
+        return '';
+    }
+
+    onAssigneeChange(user: User) {
+        this.filteredPeople = user ? this.filter(this.getDisplayName(user)) : [];
+    }
+
+    onAssigneeSelected(user: User, event: Event) {
+        if (user) {
+            this.assignee = user;
+        }
+    }
+
+    onAssigneeFocusOut(userSearchTerm: string) {
+        this.filteredPeople = userSearchTerm && userSearchTerm != '' ? this.filter(userSearchTerm) : [];
+
+        if (this.filteredPeople.length === 1) {
+            this.assignee = this.filteredPeople[0];
+        }
+    }
+
+    filter(val: string): User[] {
+        return this.people.filter((user: User) => {
+            return (this.getDisplayName(user).indexOf(val.toLowerCase()) >= 0);
+        });
     }
 
     onDateChanged(newDateValue): void {

@@ -42,15 +42,35 @@
                 </div>
             </md-grid-tile>
             <md-grid-tile>
-                <md-select placeholder="{{'START_TASK.FORM.LABEL.ASSIGNEE'|translate}}" id="assignee_id"
-                           class="adf-start-task-input-container adf-md-select" [(ngModel)]="assigneeId">
-                    <md-option>{{'START_TASK.FORM.LABEL.NONE'|translate}}</md-option>
-					<span *ngFor="let user of people">
-						<md-option [value]="user.id" *ngIf="!isUserNameEmpty(user)">{{ getDisplayUser(user.firstName,
-                            user.lastName, ' ')}}
+
+                <md-input-container class="adf-start-task-input-container">
+                    <input #inputValue
+                           mdInput
+                           type="text"
+                           id="assignee_id"
+                           [value]="getDisplayName(assignee)"
+                           [(ngModel)]="assignee"
+                           (ngModelChange)="onAssigneeChange($event)"
+                           placeholder="{{'START_TASK.FORM.LABEL.ASSIGNEE'|translate}}"
+                           [mdAutocomplete]="auto">
+
+                    <md-autocomplete #auto="mdAutocomplete" (optionSelected)="onAssigneeSelected($event.option.value)">
+                        <md-option *ngFor="let user of filteredPeople; let i = index" [value]="user">
+                            <div class="adf-people-widget-row" id="adf-people-widget-user-{{i}}">
+                                <div class="adf-people-widget-pic">
+                                    {{getInitialUserName(user)}}
+                                </div>
+                                <div *ngIf="user.userImage" class="adf-people-widget-image-row">
+                                    <img id="adf-people-widget-pic-{{i}}" class="adf-people-widget-image"
+                                         [src]="user.userImage"
+                                         (error)="onErrorImageLoad(user)"/>
+                                </div>
+                                <span class="adf-people-label-name">{{getDisplayName(user)}}</span>
+                            </div>
                         </md-option>
-					</span>
-                </md-select>
+                    </md-autocomplete>
+
+                </md-input-container>
             </md-grid-tile>
         </md-grid-list>
         <md-grid-list cols="2" rowHeight="80px">
