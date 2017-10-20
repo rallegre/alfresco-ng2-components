@@ -15,29 +15,24 @@
  * limitations under the License.
  */
 
-import { NgModule } from '@angular/core';
-import {
-    MatDialogModule,
-    MatInputModule,
-    MatListModule,
-    MatProgressBarModule,
-    MatSelectModule,
-    MatSidenavModule,
-    MatSlideToggleModule
-} from '@angular/material';
+import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
+import { MinimalNodeEntryEntity } from 'alfresco-js-api';
 
-const MATERIAL_MODULES = [
-    MatSlideToggleModule,
-    MatInputModule,
-    MatSelectModule,
-    MatListModule,
-    MatDialogModule,
-    MatSidenavModule,
-    MatProgressBarModule
-];
-
-@NgModule({
-    imports: MATERIAL_MODULES,
-    exports: MATERIAL_MODULES
+@Component({
+    selector: 'adf-version-manager',
+    templateUrl: './version-manager.component.html',
+    styleUrls: ['./version-manager.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
-export class MaterialModule {}
+export class VersionManagerComponent implements OnInit {
+
+    @Input()
+    node: MinimalNodeEntryEntity
+
+    constructor() {
+    }
+
+    ngOnInit() {
+        console.log('retek: ', this.node.id);
+    }
+}
